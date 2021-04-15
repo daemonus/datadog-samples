@@ -1,0 +1,49 @@
+version: '3'
+services:
+  weather:
+    container_name: datadog-apm-windows
+    restart: unless-stopped    
+    ports:
+      - 5000:80
+    networks: 
+      - dd-net
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      
+      - DD_ENV=Development
+      - DD_SERVICE=datadog-apm-windows
+      - DD_VERSION=1.0.0
+      
+      - CORECLR_ENABLE_PROFILING=1
+      - CORECLR_PROFILER={846F5F1C-F9AE-4B07-969E-05C26BC060D8}
+      
+      - DD_AGENT_HOST=datadog-agent
+      - DD_TRACE_AGENT_PORT=8126
+      - DD_LOGS_INJECTION=true
+      - DD_TRACE_SAMPLE_RATE=1
+    build:
+      context: src/HelloDDAgentApi/
+      labels:
+        - com.datadoghq.tags.env="Development"
+        - com.datadoghq.tags.service="datadog-apm-windows"
+        - com.datadoghq.tags.version="1.0.0"
+    depends_on:
+      - datadog-agent
+
+  datadog-agent:
+    image: datadog/agent:latest
+    container_name: datadog-agent
+    restart: unless-stopped
+    ports:
+      - 8126:8126/tcp
+    networks:
+      - dd-net
+    environment:
+      - DD_API_KEY=$DD_API_KEY
+      - DD_SITE=datadoghq.com
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      
+networks:
+  dd-net:
