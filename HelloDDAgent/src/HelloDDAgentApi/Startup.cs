@@ -1,3 +1,5 @@
+using HellDDAgentApi.Middleware;
+using HelloDDAgentApi.Tracing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,8 @@ namespace HellDDAgentApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            
+            services.AddTransient<IMicroserviceTracer, DatadogTracer>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,7 +40,7 @@ namespace HellDDAgentApi
             app.UseStatusCodePages();
 
             //app.UseHttpsRedirection();
-
+            app.UseMiddleware<DatadogTracingMiddleware>();
             app.UseRouting();
 
             app.UseAuthorization();

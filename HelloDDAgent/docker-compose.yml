@@ -31,7 +31,7 @@ services:
       - datadog-agent
 
   datadog-agent:
-    image: datadog/agent:latest
+    image: datadog/agent:7
     container_name: datadog-agent
     restart: unless-stopped
     ports:
